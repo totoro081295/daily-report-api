@@ -1,2 +1,4 @@
 daily-report-api
 .envrc
+seeds
+db/seeds/seeds

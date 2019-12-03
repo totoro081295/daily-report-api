@@ -21,7 +21,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.GET("/", func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, os.Getenv("PORT"))
+		return ctx.JSON(http.StatusOK, "Hallo World")
 	})
 
 	port := ":" + os.Getenv("PORT")
