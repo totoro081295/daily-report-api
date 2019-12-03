@@ -1,0 +1,4 @@
+export PORT="1323"
+export DATABASE_URL=postgres://totoro081295:@localhost:5432/daily-report-api
+export SSL_MODE="?sslmode=disable"
+export DB_LOGMODE=false
