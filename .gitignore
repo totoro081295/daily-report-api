@@ -1,4 +1,4 @@
-daily-report-api
+/daily-report-api
 .envrc
-seeds
+/seeds
 db/seeds/seeds
