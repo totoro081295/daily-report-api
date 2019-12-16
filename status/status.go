@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 
 	"github.com/labstack/echo"
 )
@@ -34,13 +32,6 @@ type ErrorMessage struct {
 // ResponseError 返却するエラーコードの指定
 func ResponseError(ctx echo.Context, err error) error {
 	res := ErrorMessage{}
-	if grpc.Code(err) == codes.NotFound {
-		var errMsg = ErrorMessage{
-			Code:    404,
-			Message: "Resource with ID:" + ctx.Param("id") + " is not found.",
-		}
-		return ctx.JSON(404, errMsg)
-	}
 	switch errors.Cause(err) {
 	case ErrInternalServer:
 		res.Code = 500

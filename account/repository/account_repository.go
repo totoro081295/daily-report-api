@@ -4,8 +4,9 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
+	"github.com/k0kubun/pp"
 	"github.com/pkg/errors"
-	model "github.com/totoro081295/daily-report-api/account"
+	"github.com/totoro081295/daily-report-api/account"
 	"github.com/totoro081295/daily-report-api/status"
 )
 
@@ -22,17 +23,18 @@ func NewAccountRepository(db *gorm.DB) AccountRepository {
 
 // AccountRepository repository interface
 type AccountRepository interface {
-	GetByEmail(email string) (*model.Account, error)
+	GetByEmail(email string) (*account.Account, error)
 }
 
-func (m *accountRepository) GetByEmail(email string) (*model.Account, error) {
-	var account model.Account
-	err := m.Conn.Model(&account).Where("email = ?", email).Find(&account).Error
+func (m *accountRepository) GetByEmail(email string) (*account.Account, error) {
+	var a account.Account
+	err := m.Conn.Model(&a).Where("email = ?", email).Find(&a).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, errors.Wrap(status.ErrNotFound, err.Error())
 	} else if err != nil {
+		pp.Println("koko")
 		log.Println(err)
 		return nil, errors.Wrap(status.ErrInternalServer, err.Error())
 	}
-	return &account, nil
+	return &a, nil
 }

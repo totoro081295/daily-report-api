@@ -1,28 +1,24 @@
 package main
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/totoro081295/daily-report-api/db"
-	"github.com/totoro081295/daily-report-api/db/migrations"
+	accountR "github.com/totoro081295/daily-report-api/account/repository"
+	authC "github.com/totoro081295/daily-report-api/auth/controller"
+	authU "github.com/totoro081295/daily-report-api/auth/usecase"
+	rTokenR "github.com/totoro081295/daily-report-api/refreshtoken/repository"
 )
 
 func main() {
 	e := echo.New()
+	setup(e)
+	accountRepo := accountR.NewAccountRepository(database)
+	rTokenRepo := rTokenR.NewRefreshTokenRepository(database)
 
-	db.ConnectDB()
-	// migration
-	migrations.Execute()
+	authUcase := authU.NewAuthUsecase(accountRepo, rTokenRepo, tokenHandler)
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, "Hallo World")
-	})
+	authC.NewAuthController(e, authUcase)
 
 	port := ":" + os.Getenv("PORT")
 	e.Logger.Fatal(e.Start(port))
