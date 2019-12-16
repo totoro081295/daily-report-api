@@ -2,3 +2,9 @@ export PORT="1323"
 export DATABASE_URL=postgres://totoro081295:@localhost:5432/daily-report-api
 export SSL_MODE="?sslmode=disable"
 export DB_LOGMODE=false
+
+## access tokenの有効期限 30分
+export ACCESS_TOKEN_EXPIRES_MIN="1800"
+
+export ORIGIN="http://localhost:3000"
+export REFRESH_TOKEN_EXPIRES_MIN="4320"
