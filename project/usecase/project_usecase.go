@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/gofrs/uuid"
 	"github.com/totoro081295/daily-report-api/project"
 	"github.com/totoro081295/daily-report-api/project/repository"
 )
@@ -18,9 +19,18 @@ func NewProjectUsecase(project repository.ProjectRepository) ProjectUsecase {
 
 // ProjectUsecase usecase interface
 type ProjectUsecase interface {
+	Get(id uuid.UUID) (*project.Response, error)
 	List() ([]*project.Response, error)
 }
 
+func (u *projectUsecase) Get(id uuid.UUID) (*project.Response, error) {
+	p, err := u.projectRepo.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	res := format(p)
+	return &res, nil
+}
 func (u *projectUsecase) List() ([]*project.Response, error) {
 	projects, err := u.projectRepo.List()
 	if err != nil {
