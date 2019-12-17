@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/totoro081295/daily-report-api/account"
 	"github.com/totoro081295/daily-report-api/db"
+	"github.com/totoro081295/daily-report-api/project"
 	"github.com/totoro081295/daily-report-api/refreshtoken"
 )
 
@@ -19,6 +20,7 @@ func Migrate(database *gorm.DB) {
 	database.AutoMigrate(
 		&account.Account{},
 		&refreshtoken.RefreshToken{},
+		&project.Project{},
 	)
 }
 
@@ -27,5 +29,6 @@ func DropTable(database *gorm.DB) {
 	database.DropTableIfExists(
 		&account.Account{},
 		&refreshtoken.RefreshToken{},
+		&project.Project{},
 	)
 }
