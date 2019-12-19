@@ -23,6 +23,7 @@ func NewProjectController(e *echo.Echo, project usecase.ProjectUsecase) {
 	e.GET("/projects/:id", handler.Get)
 	e.GET("/projects", handler.List)
 	e.POST("/projects", handler.Create)
+	e.PATCH("/projects", handler.Update)
 }
 
 // Get get a project
@@ -55,5 +56,19 @@ func (c *ProjectController) Create(ctx echo.Context) error {
 	if err != nil {
 		return status.ResponseError(ctx, err)
 	}
-	return ctx.JSON(http.StatusOK, res)
+	return ctx.JSON(http.StatusCreated, res)
+}
+
+// Update update project
+func (c *ProjectController) Update(ctx echo.Context) error {
+	request := project.Payload{}
+	err := ctx.Bind(&request)
+	if err != nil {
+		return ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+	err = c.projectUsecase.Update(request)
+	if err != nil {
+		return status.ResponseError(ctx, err)
+	}
+	return ctx.NoContent(http.StatusNoContent)
 }

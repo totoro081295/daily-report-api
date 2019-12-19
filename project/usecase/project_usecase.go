@@ -22,6 +22,7 @@ type ProjectUsecase interface {
 	Get(id uuid.UUID) (*project.Response, error)
 	List() ([]*project.Response, error)
 	Create(payload project.Payload) (*project.Response, error)
+	Update(payload project.Payload) error
 }
 
 func (u *projectUsecase) Get(id uuid.UUID) (*project.Response, error) {
@@ -51,6 +52,7 @@ func (u *projectUsecase) Create(payload project.Payload) (*project.Response, err
 		ID:          projectID,
 		Name:        payload.Name,
 		Description: payload.Description,
+		CreatedBy:   payload.UpdatedBy,
 	}
 	createdProject, err := u.projectRepo.Create(&p)
 	if err != nil {
@@ -58,6 +60,24 @@ func (u *projectUsecase) Create(payload project.Payload) (*project.Response, err
 	}
 	res := format(createdProject)
 	return &res, nil
+}
+
+func (u *projectUsecase) Update(payload project.Payload) error {
+	existedProject, err := u.Get(*payload.ID)
+	if err != nil {
+		return err
+	}
+	var p = project.Project{
+		ID:          existedProject.ID,
+		Name:        payload.Name,
+		Description: payload.Description,
+		UpdatedBy:   payload.UpdatedBy,
+	}
+	err = u.projectRepo.Update(&p)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func format(p *project.Project) project.Response {
