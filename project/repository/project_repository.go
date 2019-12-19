@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
@@ -23,6 +25,7 @@ func NewProjectRepository(db *gorm.DB) ProjectRepository {
 type ProjectRepository interface {
 	Get(id uuid.UUID) (*project.Project, error)
 	List() ([]*project.Project, error)
+	Create(p *project.Project) (*project.Project, error)
 }
 
 func (m *projectRepository) Get(id uuid.UUID) (*project.Project, error) {
@@ -41,6 +44,15 @@ func (m *projectRepository) List() ([]*project.Project, error) {
 	err := m.Conn.Model(&p).Find(&p).Error
 	if err != nil {
 		return nil, err
+	}
+	return p, nil
+}
+
+func (m *projectRepository) Create(p *project.Project) (*project.Project, error) {
+	err := m.Conn.Create(&p).Error
+	if err != nil {
+		log.Println(err)
+		return nil, errors.Wrap(status.ErrInternalServer, err.Error())
 	}
 	return p, nil
 }

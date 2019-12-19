@@ -21,6 +21,7 @@ func NewProjectUsecase(project repository.ProjectRepository) ProjectUsecase {
 type ProjectUsecase interface {
 	Get(id uuid.UUID) (*project.Response, error)
 	List() ([]*project.Response, error)
+	Create(payload project.Payload) (*project.Response, error)
 }
 
 func (u *projectUsecase) Get(id uuid.UUID) (*project.Response, error) {
@@ -42,6 +43,21 @@ func (u *projectUsecase) List() ([]*project.Response, error) {
 		res = append(res, &r)
 	}
 	return res, nil
+}
+
+func (u *projectUsecase) Create(payload project.Payload) (*project.Response, error) {
+	projectID, _ := uuid.NewV4()
+	var p = project.Project{
+		ID:          projectID,
+		Name:        payload.Name,
+		Description: payload.Description,
+	}
+	createdProject, err := u.projectRepo.Create(&p)
+	if err != nil {
+		return nil, err
+	}
+	res := format(createdProject)
+	return &res, nil
 }
 
 func format(p *project.Project) project.Response {
