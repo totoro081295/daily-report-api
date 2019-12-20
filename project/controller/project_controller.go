@@ -72,3 +72,13 @@ func (c *ProjectController) Update(ctx echo.Context) error {
 	}
 	return ctx.NoContent(http.StatusNoContent)
 }
+
+// Delete delete project
+func (c *ProjectController) Delete(ctx echo.Context) error {
+	id := uuid.FromStringOrNil(ctx.Param("id"))
+	err := c.projectUsecase.Delete(id)
+	if err != nil {
+		return status.ResponseError(ctx, err)
+	}
+	return ctx.NoContent(http.StatusNoContent)
+}
