@@ -27,6 +27,7 @@ type ProjectRepository interface {
 	List() ([]*project.Project, error)
 	Create(p *project.Project) (*project.Project, error)
 	Update(p *project.Project) error
+	Delete(id uuid.UUID) error
 }
 
 func (m *projectRepository) Get(id uuid.UUID) (*project.Project, error) {
@@ -62,6 +63,15 @@ func (m *projectRepository) Update(p *project.Project) error {
 	err := m.Conn.Model(p).Update(p).Error
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *projectRepository) Delete(id uuid.UUID) error {
+	var p project.Project
+	err := m.Conn.Model(&p).Where("id = ?", id).Delete(&p).Error
+	if err != nil {
+		return errors.Wrap(status.ErrInternalServer, err.Error())
 	}
 	return nil
 }
