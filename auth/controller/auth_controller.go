@@ -19,7 +19,7 @@ func NewAuthController(e *echo.Echo, us usecase.AuthUsecase) {
 	handler := &AuthController{
 		AuthUsecase: us,
 	}
-	e.POST("/auth/login", handler.Login)
+	e.POST("/login", handler.Login)
 }
 
 // Login login
