@@ -10,6 +10,7 @@ import (
 	"github.com/totoro081295/daily-report-api/auth"
 	"github.com/totoro081295/daily-report-api/refreshtoken"
 	rTokenRepo "github.com/totoro081295/daily-report-api/refreshtoken/repository"
+	"github.com/totoro081295/daily-report-api/status"
 	"github.com/totoro081295/daily-report-api/token"
 )
 
@@ -36,6 +37,7 @@ func NewAuthUsecase(
 type AuthUsecase interface {
 	Login(l *auth.Login) (*auth.Token, error)
 	Logout(id uuid.UUID) error
+	Refresh(t *auth.Refresh) (*auth.Token, error)
 }
 
 func (a *authUsecase) Login(l *auth.Login) (*auth.Token, error) {
@@ -88,4 +90,49 @@ func (a *authUsecase) Logout(id uuid.UUID) error {
 		return err
 	}
 	return nil
+}
+
+func (a *authUsecase) Refresh(t *auth.Refresh) (*auth.Token, error) {
+	r, err := a.rTokenRepo.Get(t.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	err = a.rTokenRepo.Delete(t.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	// 有効期限チェック 有効期限 < 現在
+	now := time.Now()
+	if !now.Before(r.Expired) {
+		return nil, status.ErrUnauthorized
+	}
+	if t.AccountID != r.AccountID {
+		return nil, status.ErrUnauthorized
+	}
+
+	refreshToken := a.token.RandToken()
+	accessToken, err := a.token.GenerateJWT(r.AccountID, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// 文字列を数値に
+	atoi, _ := strconv.Atoi(os.Getenv("REFRESH_TOKEN_EXPIRES_MIN"))
+	rTokenID, _ := uuid.NewV4()
+	insert := &refreshtoken.RefreshToken{
+		ID:           rTokenID,
+		AccountID:    r.AccountID,
+		RefreshToken: refreshToken,
+		Expired:      time.Now().Add(time.Minute * time.Duration(atoi)),
+	}
+	err = a.rTokenRepo.Create(insert)
+	if err != nil {
+		return nil, err
+	}
+	res := auth.Token{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+
+	return &res, nil
 }

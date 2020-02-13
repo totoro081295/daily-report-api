@@ -17,8 +17,8 @@ var (
 	ErrConflict = errors.New("Your Item already exist")
 	// ErrBadRequest bad request error
 	ErrBadRequest = errors.New("Bad request")
-	// ErrUnauthrized unauthorized error
-	ErrUnauthrized = errors.New("Unauthorized")
+	// ErrUnauthorized unauthorized error
+	ErrUnauthorized = errors.New("Unauthorized")
 	// ErrForbidden forbidden error
 	ErrForbidden = errors.New("Forbidden")
 )
@@ -49,7 +49,7 @@ func ResponseError(ctx echo.Context, err error) error {
 		res.Code = 400
 		res.Message = err.Error()
 		return ctx.JSON(http.StatusBadRequest, res)
-	case ErrUnauthrized:
+	case ErrUnauthorized:
 		res.Code = http.StatusUnauthorized
 		res.Message = err.Error()
 		return ctx.JSON(http.StatusUnauthorized, res)

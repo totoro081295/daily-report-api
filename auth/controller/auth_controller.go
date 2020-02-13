@@ -21,6 +21,7 @@ func NewAuthController(e *echo.Echo, us usecase.AuthUsecase) {
 	}
 	e.POST("/login", handler.Login)
 	e.POST("/logout", handler.Logout)
+	e.POST("/refresh", handler.Refresh)
 }
 
 // Login login
@@ -64,4 +65,19 @@ func (c *AuthController) Logout(ctx echo.Context) error {
 	}
 
 	return ctx.NoContent(http.StatusNoContent)
+}
+
+// Refresh refresh
+func (c *AuthController) Refresh(ctx echo.Context) error {
+	request := auth.Refresh{}
+	err := ctx.Bind(&request)
+	if err != nil {
+		return ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	token, err := c.AuthUsecase.Refresh(&request)
+	if err != nil {
+		return status.ResponseError(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, token)
 }
