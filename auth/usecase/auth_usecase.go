@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/k0kubun/pp"
 	accountRepo "github.com/totoro081295/daily-report-api/account/repository"
 	"github.com/totoro081295/daily-report-api/auth"
 	"github.com/totoro081295/daily-report-api/refreshtoken"
@@ -36,19 +35,18 @@ func NewAuthUsecase(
 // AuthUsecase usecase interface
 type AuthUsecase interface {
 	Login(l *auth.Login) (*auth.Token, error)
+	Logout(id uuid.UUID) error
 }
 
 func (a *authUsecase) Login(l *auth.Login) (*auth.Token, error) {
 	account, err := a.accountRepo.GetByEmail(l.Email)
 	if err != nil {
-		pp.Println("account, err := a.accountRepo.GetByEmail(l.Email)")
 		return nil, err
 	}
 	refresh, err := a.rTokenRepo.GetByAccountID(account.ID)
 	if refresh != nil {
 		err := a.rTokenRepo.Delete(refresh.RefreshToken)
 		if err != nil {
-			pp.Println("err := a.rTokenRepo.Delete(refresh.RefreshToken)")
 			return nil, err
 		}
 	}
@@ -65,13 +63,11 @@ func (a *authUsecase) Login(l *auth.Login) (*auth.Token, error) {
 
 	err = a.rTokenRepo.Create(insert)
 	if err != nil {
-		pp.Println("err = a.rTokenRepo.Create(insert)")
 		return nil, err
 	}
 
 	token, err := a.token.GenerateJWT(account.ID, false)
 	if err != nil {
-		pp.Println("token, err := a.token.GenerateJWT(account.ID, false)")
 		return nil, err
 	}
 
@@ -80,4 +76,16 @@ func (a *authUsecase) Login(l *auth.Login) (*auth.Token, error) {
 		RefreshToken: refreshToken,
 	}
 	return &res, nil
+}
+
+func (a *authUsecase) Logout(id uuid.UUID) error {
+	refresh, err := a.rTokenRepo.GetByAccountID(id)
+	if err != nil {
+		return err
+	}
+	err = a.rTokenRepo.Delete(refresh.RefreshToken)
+	if err != nil {
+		return err
+	}
+	return nil
 }

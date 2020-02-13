@@ -20,6 +20,7 @@ func NewAuthController(e *echo.Echo, us usecase.AuthUsecase) {
 		AuthUsecase: us,
 	}
 	e.POST("/login", handler.Login)
+	e.POST("/logout", handler.Logout)
 }
 
 // Login login
@@ -41,4 +42,26 @@ func (c *AuthController) Login(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, token)
+}
+
+// Logout logout
+func (c *AuthController) Logout(ctx echo.Context) error {
+	request := auth.Logout{}
+	err := ctx.Bind(&request)
+	if err != nil {
+		return ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// validation
+	err = auth.LogoutValidate(&request)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	err = c.AuthUsecase.Logout(request.ID)
+	if err != nil {
+		return status.ResponseError(ctx, err)
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
 }
