@@ -3,6 +3,8 @@ package auth
 import (
 	"errors"
 	"regexp"
+
+	"github.com/gofrs/uuid"
 )
 
 // LoginValidate validate login
@@ -22,6 +24,15 @@ func LoginValidate(login *Login) error {
 		if len([]byte(login.Password)) < 8 {
 			return errors.New("password must be 8 length")
 		}
+	}
+	return nil
+}
+
+// LogoutValidate validate logout
+func LogoutValidate(logout *Logout) error {
+	// 必須チェック
+	if logout.ID == uuid.FromStringOrNil("") {
+		return errors.New("id is required")
 	}
 	return nil
 }
