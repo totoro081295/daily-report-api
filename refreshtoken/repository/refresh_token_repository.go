@@ -23,9 +23,22 @@ func NewRefreshTokenRepository(db *gorm.DB) RefreshTokenRepository {
 
 // RefreshTokenRepository repository interface
 type RefreshTokenRepository interface {
+	Get(token string) (*refreshtoken.RefreshToken, error)
 	GetByAccountID(id uuid.UUID) (*refreshtoken.RefreshToken, error)
 	Create(token *refreshtoken.RefreshToken) error
 	Delete(token string) error
+}
+
+func (m *refreshTokenRepository) Get(token string) (*refreshtoken.RefreshToken, error) {
+	var refreshToken refreshtoken.RefreshToken
+	err := m.Conn.Model(&refreshToken).Where("refresh_token = ?", token).Find(&refreshToken).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, errors.Wrap(status.ErrNotFound, err.Error())
+	} else if err != nil {
+		log.Println(err)
+		return nil, errors.Wrap(status.ErrInternalServer, err.Error())
+	}
+	return &refreshToken, nil
 }
 
 func (m *refreshTokenRepository) GetByAccountID(id uuid.UUID) (*refreshtoken.RefreshToken, error) {
