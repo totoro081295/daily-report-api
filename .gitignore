@@ -2,3 +2,4 @@
 .envrc
 /seeds
 db/seeds/seeds
+*.http
