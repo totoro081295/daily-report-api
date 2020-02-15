@@ -3,6 +3,7 @@ package repository
 import (
 	"log"
 
+	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/totoro081295/daily-report-api/account"
@@ -22,7 +23,20 @@ func NewAccountRepository(db *gorm.DB) AccountRepository {
 
 // AccountRepository repository interface
 type AccountRepository interface {
+	Get(id uuid.UUID) (*account.Account, error)
 	GetByEmail(email string) (*account.Account, error)
+}
+
+func (m *accountRepository) Get(id uuid.UUID) (*account.Account, error) {
+	var a account.Account
+	err := m.Conn.Model(&a).Where("id = ?", id).Find(&a).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, errors.Wrap(status.ErrNotFound, err.Error())
+	} else if err != nil {
+		log.Println(err)
+		return nil, errors.Wrap(status.ErrInternalServer, err.Error())
+	}
+	return &a, nil
 }
 
 func (m *accountRepository) GetByEmail(email string) (*account.Account, error) {
