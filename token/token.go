@@ -2,15 +2,18 @@ package token
 
 import (
 	"crypto/rsa"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
+	"github.com/labstack/echo"
 )
 
 type tokenHandler struct{}
@@ -22,6 +25,7 @@ func NewTokenHandler() Handler {
 
 // Handler token handler interface
 type Handler interface {
+	GetToken(ctx echo.Context) (uuid.UUID, error)
 	RandToken() string
 	GenerateJWT(id uuid.UUID, valid bool) (string, error)
 	LoadJWTPublicKeys() (*rsa.PublicKey, error)
@@ -103,4 +107,37 @@ func (h *tokenHandler) RandToken() string {
 		remain--
 	}
 	return string(rand)
+}
+
+// GetToken jwtのuuidを取得
+func (h *tokenHandler) GetToken(ctx echo.Context) (uuid.UUID, error) {
+	token := ctx.Request().Header.Get("Authorization")
+	tokenString := strings.Replace(token, "Bearer ", "", 1)
+	parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// check signing method
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			err := errors.New("Unexpected signing method")
+			return nil, err
+		}
+		key, err := h.LoadJWTPublicKeys()
+		if err != nil {
+			return nil, err
+		}
+		return key, nil
+	})
+	if err != nil {
+		return uuid.Nil, err
+	}
+	if !parsedToken.Valid {
+		return uuid.Nil, errors.New("Token is invalid")
+	}
+
+	claims := parsedToken.Claims.(jwt.MapClaims)
+	sub := claims["sub"].(string)
+	accountID, err := uuid.FromString(sub)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return accountID, nil
 }
