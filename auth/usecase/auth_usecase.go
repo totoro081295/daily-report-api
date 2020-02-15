@@ -12,6 +12,7 @@ import (
 	rTokenRepo "github.com/totoro081295/daily-report-api/refreshtoken/repository"
 	"github.com/totoro081295/daily-report-api/status"
 	"github.com/totoro081295/daily-report-api/token"
+	"github.com/totoro081295/daily-report-api/utils"
 )
 
 type authUsecase struct {
@@ -45,6 +46,11 @@ func (a *authUsecase) Login(l *auth.Login) (*auth.Token, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = utils.CompareHashPassword(account.Password, l.Password)
+	if err != nil {
+		return nil, status.ErrUnauthorized
+	}
+
 	refresh, err := a.rTokenRepo.GetByAccountID(account.ID)
 	if refresh != nil {
 		err := a.rTokenRepo.Delete(refresh.RefreshToken)
