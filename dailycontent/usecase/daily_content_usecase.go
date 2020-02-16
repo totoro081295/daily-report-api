@@ -3,6 +3,7 @@ package usecase
 import (
 	"time"
 
+	"github.com/k0kubun/pp"
 	"github.com/totoro081295/daily-report-api/dailycontent"
 
 	"github.com/totoro081295/daily-report-api/dailycontent/repository"
@@ -25,6 +26,7 @@ type DailyContentUsecase interface {
 }
 
 func (d *dailyContentUsecase) GetByTargetDate(date time.Time) (*dailycontent.Response, error) {
+	pp.Println("usecase", date)
 	dailyContent, err := d.dailyContentRepo.GetByTargetDate(date)
 	if err != nil {
 		return nil, err
