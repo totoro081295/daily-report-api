@@ -8,6 +8,7 @@ import (
 	"github.com/totoro081295/daily-report-api/db"
 	"github.com/totoro081295/daily-report-api/project"
 	"github.com/totoro081295/daily-report-api/refreshtoken"
+	"github.com/totoro081295/daily-report-api/task"
 )
 
 // Execute execute migration
@@ -23,8 +24,9 @@ func Migrate(database *gorm.DB) {
 		&account.Account{},
 		&category.Category{},
 		&dailycontent.DailyContent{},
-		&refreshtoken.RefreshToken{},
 		&project.Project{},
+		&refreshtoken.RefreshToken{},
+		&task.Task{},
 	)
 }
 
@@ -34,7 +36,8 @@ func DropTable(database *gorm.DB) {
 		&account.Account{},
 		&category.Category{},
 		&dailycontent.DailyContent{},
-		&refreshtoken.RefreshToken{},
 		&project.Project{},
+		&refreshtoken.RefreshToken{},
+		&task.Task{},
 	)
 }
