@@ -25,6 +25,7 @@ func NewProjectRepository(db *gorm.DB) ProjectRepository {
 type ProjectRepository interface {
 	Get(id uuid.UUID) (*project.Project, error)
 	List() ([]*project.Project, error)
+	ListByIDs(ids []uuid.UUID) ([]*project.Project, error)
 	Create(p *project.Project) (*project.Project, error)
 	Update(p *project.Project) error
 	Delete(id uuid.UUID) error
@@ -44,6 +45,15 @@ func (m *projectRepository) Get(id uuid.UUID) (*project.Project, error) {
 func (m *projectRepository) List() ([]*project.Project, error) {
 	var p []*project.Project
 	err := m.Conn.Model(&p).Find(&p).Error
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (m *projectRepository) ListByIDs(ids []uuid.UUID) ([]*project.Project, error) {
+	var p []*project.Project
+	err := m.Conn.Model(&p).Where("id in (?)", ids).Find(&p).Error
 	if err != nil {
 		return nil, err
 	}

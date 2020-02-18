@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/totoro081295/daily-report-api/category"
+	"github.com/totoro081295/daily-report-api/project"
 )
 
 // Task task struct
@@ -34,4 +36,31 @@ func (t Collection) GetIDs() []uuid.UUID {
 		IDs[i] = t[i].ID
 	}
 	return IDs
+}
+
+// GetCategoryIDs idの配列を返す
+func (t Collection) GetCategoryIDs() []uuid.UUID {
+	categoryIDs := make([]uuid.UUID, len(t))
+	for i := 0; i < len(t); i++ {
+		categoryIDs[i] = t[i].CategoryID
+	}
+	return categoryIDs
+}
+
+// GetProjectIDs idの配列を返す
+func (t Collection) GetProjectIDs() []uuid.UUID {
+	projectIDs := make([]uuid.UUID, len(t))
+	for i := 0; i < len(t); i++ {
+		projectIDs[i] = t[i].ProjectID
+	}
+	return projectIDs
+}
+
+// Response task response
+type Response struct {
+	ID         uuid.UUID         `json:"id"`
+	Name       string            `json:"name"`
+	TargetDate time.Time         `json:"target_date"`
+	Category   category.Response `json:"category"`
+	Project    project.Response  `json:"project"`
 }
