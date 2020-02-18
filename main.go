@@ -33,7 +33,7 @@ func main() {
 
 	accountC.NewAccountController(e, accountUcase, tokenHandler, jwt)
 	authC.NewAuthController(e, authUcase)
-	dContentC.NewDailyContentController(e, dContentUcase, jwt)
+	dContentC.NewDailyContentController(e, dContentUcase, tokenHandler, jwt)
 	projectC.NewProjectController(e, projectUcase)
 
 	port := ":" + os.Getenv("PORT")
