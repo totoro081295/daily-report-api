@@ -25,6 +25,7 @@ func NewDailyContentRepository(db *gorm.DB) DailyContentRepository {
 type DailyContentRepository interface {
 	GetByTargetDate(targetDate time.Time) (*model.DailyContent, error)
 	Create(dailyContent *model.DailyContent) (*model.DailyContent, error)
+	Update(dailyContent *model.DailyContent) error
 }
 
 func (m *dailyContentRepository) GetByTargetDate(targetDate time.Time) (*model.DailyContent, error) {
@@ -46,4 +47,12 @@ func (m *dailyContentRepository) Create(dailyContent *model.DailyContent) (*mode
 		return nil, errors.Wrap(status.ErrInternalServer, err.Error())
 	}
 	return dailyContent, nil
+}
+
+func (m *dailyContentRepository) Update(dailyContent *model.DailyContent) error {
+	err := m.Conn.Model(dailyContent).Update(dailyContent).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
