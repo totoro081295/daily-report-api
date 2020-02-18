@@ -3,6 +3,7 @@ package migrations
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/totoro081295/daily-report-api/account"
+	"github.com/totoro081295/daily-report-api/category"
 	"github.com/totoro081295/daily-report-api/dailycontent"
 	"github.com/totoro081295/daily-report-api/db"
 	"github.com/totoro081295/daily-report-api/project"
@@ -20,6 +21,7 @@ func Execute() {
 func Migrate(database *gorm.DB) {
 	database.AutoMigrate(
 		&account.Account{},
+		&category.Category{},
 		&dailycontent.DailyContent{},
 		&refreshtoken.RefreshToken{},
 		&project.Project{},
@@ -30,6 +32,7 @@ func Migrate(database *gorm.DB) {
 func DropTable(database *gorm.DB) {
 	database.DropTableIfExists(
 		&account.Account{},
+		&category.Category{},
 		&dailycontent.DailyContent{},
 		&refreshtoken.RefreshToken{},
 		&project.Project{},
