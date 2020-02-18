@@ -18,7 +18,9 @@ func NewTaskDateRepository(db *gorm.DB) TaskDateRepository {
 }
 
 // TaskDateRepository repository interface
-type TaskDateRepository interface{}
+type TaskDateRepository interface {
+	ListByTaskIDs(ids []uuid.UUID) ([]*taskdate.TaskDate, error)
+}
 
 func (m *taskDateRepository) ListByTaskIDs(ids []uuid.UUID) ([]*taskdate.TaskDate, error) {
 	var taskDates = []*taskdate.TaskDate{}
