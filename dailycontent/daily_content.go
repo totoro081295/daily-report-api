@@ -23,3 +23,17 @@ type Response struct {
 	ID   uuid.UUID `json:"id"`
 	Text string    `json:"text"`
 }
+
+// CreatePayload struct daily content payload
+type CreatePayload struct {
+	Text       string    `json:"text"`
+	TargetDate time.Time `json:"targetDate"`
+	CreatedBy  uuid.UUID
+}
+
+// CreateResponse struct daily content create response
+type CreateResponse struct {
+	ID         uuid.UUID `json:"id"`
+	Text       string    `json:"text"`
+	TargetDate time.Time `json:"targetDate"`
+}
