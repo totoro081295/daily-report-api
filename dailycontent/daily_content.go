@@ -37,3 +37,10 @@ type CreateResponse struct {
 	Text       string    `json:"text"`
 	TargetDate time.Time `json:"targetDate"`
 }
+
+// UpdatePayload struct daily content payload
+type UpdatePayload struct {
+	ID        uuid.UUID `json:"id"`
+	Text      string    `json:"text"`
+	UpdatedBy uuid.UUID
+}
