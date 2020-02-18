@@ -23,3 +23,15 @@ type Task struct {
 	UpdatedAt   time.Time  `json:"updatedAt" name:"更新日"`
 	DeletedAt   *time.Time `json:"deletedAt" name:"削除日"`
 }
+
+// Collection task arrat
+type Collection []*Task
+
+// GetIDs idの配列を返す
+func (t Collection) GetIDs() []uuid.UUID {
+	IDs := make([]uuid.UUID, len(t))
+	for i := 0; i < len(t); i++ {
+		IDs[i] = t[i].ID
+	}
+	return IDs
+}
