@@ -23,4 +23,5 @@ func NewDailyContentUsecase(dailyContet repository.DailyContentRepository) Daily
 type DailyContentUsecase interface {
 	GetByTargetDate(date time.Time) (*dailycontent.Response, error)
 	Create(payload *dailycontent.CreatePayload) (*dailycontent.CreateResponse, error)
+	Update(payload dailycontent.UpdatePayload) error
 }
