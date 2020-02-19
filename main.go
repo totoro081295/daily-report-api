@@ -19,6 +19,10 @@ import (
 	projectR "github.com/totoro081295/daily-report-api/project/repository"
 	projectU "github.com/totoro081295/daily-report-api/project/usecase"
 	rTokenR "github.com/totoro081295/daily-report-api/refreshtoken/repository"
+	taskC "github.com/totoro081295/daily-report-api/task/controller"
+	taskR "github.com/totoro081295/daily-report-api/task/repository"
+	taskU "github.com/totoro081295/daily-report-api/task/usecase"
+	taskDateR "github.com/totoro081295/daily-report-api/taskdate/repository"
 )
 
 func main() {
@@ -29,18 +33,22 @@ func main() {
 	dContentRepo := dContentR.NewDailyContentRepository(database)
 	rTokenRepo := rTokenR.NewRefreshTokenRepository(database)
 	projectRepo := projectR.NewProjectRepository(database)
+	taskRepo := taskR.NewTaskRepository(database)
+	taskDateRepo := taskDateR.NewTaskDateRepository(database)
 
 	accountUcase := accountU.NewAccountUsecase(accountRepo)
 	authUcase := authU.NewAuthUsecase(accountRepo, rTokenRepo, tokenHandler)
 	categoryUcase := categoryU.NewCategoryUsecase(categoryRepo)
 	dContentUcase := dContentU.NewDailyContentUsecase(dContentRepo)
 	projectUcase := projectU.NewProjectUsecase(projectRepo)
+	taskUcase := taskU.NewTaskUsecase(taskRepo, taskDateRepo, projectRepo, categoryRepo)
 
 	accountC.NewAccountController(e, accountUcase, tokenHandler, jwt)
 	authC.NewAuthController(e, authUcase)
 	categoryC.NewCategoryController(e, categoryUcase, jwt)
 	dContentC.NewDailyContentController(e, dContentUcase, tokenHandler, jwt)
 	projectC.NewProjectController(e, projectUcase)
+	taskC.NewTaskController(e, taskUcase, jwt)
 
 	port := ":" + os.Getenv("PORT")
 	e.Logger.Fatal(e.Start(port))
